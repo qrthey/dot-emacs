@@ -1,0 +1,1041 @@
+#+TITLE: Dot Emacs
+#+STARTUP: indent overview
+#+OPTIONS: num:nil toc:nil html-postamble:nil
+
+* About Dot Emacs
+
+Tangling (~org-babel-tangle~) this document will emit 2 files,
+~dot-emacs-base.el~ and ~dot-emacs.clojure.el~. In a newly, blank,
+installed emacs it should then be sufficient to load these files from
+the init file (e.g. ~/.emacs). The base file is required and must be
+loaded first. The clojure file is only useful when doing clojure or
+clojurescript development and can be loaded after the base
+configuration file.
+
+Example content of ~/.emacs
+
+#+begin_src elisp
+  (load-file "PATH-TO-THIS-REPOSITORY/dot-emacs-base.el")
+  ;; (load-file "PATH-TO-THIS-REPOSITORY/dot-emacs-clojure.el")
+#+end_src
+
+Restarting emacs should then automatically bootstrap it and complete
+the configuration process.
+
+** Opinionated?
+
+Of course, it's an emacs configuration!! I think that this
+configuration is rather minimalistic, relying mostly on built-in emacs
+functionality. As a bonus, emacs should start up rather fastly with
+this configuration.
+
+Names of custom defined functions start with ~qrt/~ to limit the
+possibility of having conflicts with function names in other packages.
+
+In a same manner, custom keybindings typicaly start with ~C-æ~ as
+this special danish character is unlikely to be used by any package.
+
+** No theme?
+
+No theme is auto-loaded from this config (some are installed though).
+I prefer to add a ~load-theme~ call in the emacs init file (after the
+example pre-lude above) as this allows usage of different themes on
+different machines, without the need to first onload a previously
+loaded theme.
+
+* Base
+:PROPERTIES:
+:header-args: :tangle "dot-emacs-base.el"
+:END:
+** Log basic information during startup of emacs
+
+Log when emacs was started, and whether it is running as a daemon or a
+new instance.
+
+#+begin_src elisp
+  (message "*** emacs started at %s as %s ***"
+           (current-time-string)
+           (if (daemonp)
+               "daemon"
+             "new instance"))
+#+end_src
+
+** Package installation infrastructure
+*** Enable the gnu and melpa package-archives
+
+#+begin_src elisp
+  (require 'package)
+  (setq package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
+  (package-initialize)
+#+end_src
+
+*** Define helpers for installing packages
+
+~ensure-packages-installed~ can be used to install packages if they
+aren't installed yet. If at least one of the packages supplied isn't
+installed yet, the function will first force a sync with the
+configured package-archives.
+
+#+begin_src elisp
+  (defvar has-package-refresh-contents-run nil)
+
+  (defun ensure-packages-installed (packages)
+    (dolist (p packages)
+      (unless (package-installed-p p)
+        (unless has-package-refresh-contents-run
+          (package-refresh-contents)
+          (setq has-package-refresh-contents-run t))
+        (package-install p))))
+#+end_src
+
+** Configuration of standard emacs
+*** Don't show the splash-screen at startup
+
+#+begin_src elisp
+  (setq inhibit-splash-screen t)
+#+end_src
+
+*** Don't show menu-bar, tool-bar and scroll-bars
+
+#+begin_src elisp
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+#+end_src
+
+*** Do show line and column numbers in the mode-line
+
+#+begin_src elisp
+  (setq line-number-mode t)
+  (setq column-number-mode t)
+#+end_src
+
+*** keep the cursor blinking
+
+By default, the cursor stops blinking after 10 blinks. Make it keep
+blinking.
+
+#+begin_src elisp
+  (setq blink-cursor-blinks -1)
+#+end_src
+
+*** Split screen vertically when width is getting small
+
+#+begin_src elisp
+  (setq split-width-threshold 135)
+  (setq split-height-threshold nil)
+#+end_src
+
+*** Prefer UTF-8
+
+#+begin_src elisp
+  (prefer-coding-system 'utf-8)
+#+end_src
+
+*** Do not default to electric-indent-mode
+#+begin_src elisp
+  (electric-indent-mode -1)
+#+end_src
+*** Prefer spaces for indentation, not TABs
+
+Emacs seems to be intelligent about this, and in the case of e.g.
+Makefile files still uses TABs, as this is required by the Makefiles
+format.
+
+#+begin_src elisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
+*** Sentences are separated with a single space
+
+By default, emacs expects sentences to be followed be 2 spaces, an old
+(american) convention used on typewriters. 1 space is the norm today.
+This value is for example used by emacs when filling paragraphs.
+
+#+begin_src elisp
+  (setq sentence-end-double-space nil)
+#+end_src
+
+*** Use git instead of backup files
+
+This setting only affects the behavior of emacs when a file is saved.
+By default a backup file of the original file content would be saved
+as well, which we prevent here, as valuable files would live in a
+version control system such as git anyways.
+
+Emacs will still periodically save recovery files so that the user can
+get back to a more recent file state than the last saved state on disk
+(by the user) in case of a crash or other hard kill of the emacs
+process.
+
+#+begin_src elisp
+  (setq make-backup-files nil)
+#+end_src
+
+*** Whenever a file is saved, remove trailing whitespace first
+
+#+begin_src elisp
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+end_src
+
+*** dired: sort directories first and use human readable reported file sizes
+
+The following switches are passed to the ~ls~ command that is used by
+default as the ~insert-directory-program~ on linux.
+
+#+begin_src elisp
+  (setq dired-listing-switches "-alh --group-directories-first")
+#+end_src
+
+*** eshell
+
+Register programs that should not run inside of eshell, because they
+use terminal specific behavior such as ncurses etc. Whenever any of
+these =visual= commands are invoked from eshell, a ~term~ subprocess
+is launched to run the program in.
+
+#+begin_src elisp
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (dolist (prog '("bash" "vim" "ranger" "tmux" "htop"))
+                (add-to-list 'eshell-visual-commands prog))))
+#+end_src
+*** org mode
+**** Make org-mode the default mode for a new buffer
+
+#+begin_src elisp
+  (setq-default major-mode 'org-mode)
+#+end_src
+**** Use indentation by default
+
+#+begin_src elisp
+  (setq org-startup-indented t)
+#+end_src
+
+**** Speed commands are very useful
+
+#+begin_src elisp
+  (setq org-use-speed-commands t)
+#+end_src
+
+**** enable auto-fill-mode when org mode is activated
+
+#+begin_src elisp
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+#+end_src
+
+**** Improve html export
+
+When exporting to html, do not include the colors of the current theme
+as they might work badly on a white background.
+
+#+begin_src elisp
+  (setq org-html-htmlize-output-type nil)
+#+end_src
+
+**** Do not require confirmation when executing a code block
+
+#+begin_src elisp
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+**** Enable evaluation of shell source blocks
+
+~elisp~ can be evaluated by default, but bash needs ~ob-shell~ to be
+loaded for org-babel.
+
+#+begin_src elisp
+  (require 'ob-shell)
+#+end_src
+
+**** Improve the looks of org-mode
+
+Org bullets and a bit of regex go a long way to have nicer headings
+and items lists. When also using latex in org-buffers.
+
+#+begin_src elisp
+
+  (ensure-packages-installed '(org-bullets))
+
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+  (font-lock-add-keywords
+   'org-mode
+   '(("^ *\\([-]\\) "
+      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  (font-lock-add-keywords
+   'org-mode
+   '(("^ *\\([+]\\) "
+      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
+
+#+end_src
+
+Sometimes the inline rendered latex output is rather small, but we can
+bump the scale factor.
+
+#+begin_src elisp
+  (add-hook 'org-mode-hook
+            (lambda () (setq org-format-latex-options
+                             (plist-put org-format-latex-options :scale 2.0))))
+
+
+#+end_src
+
+**** Org Tree Slide for slide shows
+~org-tree-slide~ is a package that allows for using an org document as
+a presentation/slide-show.
+
+#+begin_src elisp
+  (ensure-packages-installed '(org-tree-slide))
+#+end_src
+
+Some helpers to hide org meta-lines in presentation mode.
+
+#+begin_src elisp
+
+  (defvar qrt/org-meta-line-hidden-p nil)
+  (defun qrt/hide-org-meta-line ()
+    (interactive)
+    (setq qrt/org-meta-line-hidden-p t)
+    (set-face-attribute 'org-meta-line nil
+                        :foreground (face-attribute 'default :background)))
+
+  (defun qrt/show-org-meta-line ()
+    (interactive)
+    (setq qrt/org-meta-line-hidden-p nil)
+    (set-face-attribute 'org-meta-line nil :foreground nil))
+
+  (defun qrt/toggle-org-meta-line-visibility ()
+    (interactive)
+    (if qrt/org-meta-line-hidden-p
+        (qrt/show-org-meta-line)
+      (qrt/hide-org-meta-line)))
+#+end_src
+
+Some helpers to hide the emacs mode line when in presentation mode.
+
+#+begin_src elisp
+  (defvar qrt/orig-mode-line mode-line-format)
+
+  (defun qrt/hide-mode-line ()
+    (setq-default mode-line-format nil))
+
+  (defun qrt/show-mode-line ()
+    (setq-default mode-line-format qrt/orig-mode-line))
+
+  (defun qrt/toggle-mode-line ()
+    (interactive)
+    (if mode-line-format
+        (qrt/hide-mode-line)
+      (qrt/show-mode-line)))
+#+end_src
+
+And finally functionality to automate starting and stopping
+presentation mode with custom key-bindings.
+
+- F8 to start a slideshow
+  - C-<right> for next slide
+  - C-<left> for previous slide
+- F8 to stop a running slideshow
+
+#+begin_src elisp
+  (setq org-image-actual-width nil)
+  (setq org-tree-slide-activate-message "slideshow started")
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (local-set-key (kbd "<f8>") 'org-tree-slide-mode)))
+
+  (eval-after-load 'org-tree-slide
+    (lambda ()
+      (define-key org-tree-slide-mode-map (kbd "C-<right>") 'org-tree-slide-move-next-tree)
+      (define-key org-tree-slide-mode-map (kbd "C-<left>") 'org-tree-slide-move-previous-tree)))
+
+  (defun qrt/init-org-tree-slide ()
+    (org-toggle-inline-images 1)
+    (qrt/hide-mode-line)
+    (qrt/hide-org-meta-line)
+    (qrt/font-size 200))
+
+  (defun qrt/finish-org-tree-slide ()
+    (org-toggle-inline-images nil)
+    (qrt/show-mode-line)
+    (qrt/show-org-meta-line)
+    (qrt/font-size 100))
+
+  (add-hook 'org-tree-slide-play-hook #'qrt/init-org-tree-slide)
+  (add-hook 'org-tree-slide-stop-hook #'qrt/finish-org-tree-slide)
+#+end_src
+*** eglot
+
+~eglot~ is an emacs built-in package that interacts with lsp servers.
+
+By default when ~eglot~ wants to edit files because of an issued
+command it asks for confirmation. This default is overridden to
+automatically allow ~eglot~ to make edits.
+
+Some ~eglot~ functionality is used frequently, so keybindings can come
+in handily. The following functionality is made available with prefix
+~C-æ l~
+
+- quickfix
+- organize-imports
+- rename
+
+#+begin_src elisp
+  (setq eglot-confirm-server-initiated-edits nil)
+
+  (defun qrt/add-eglot-key-bindings
+      ()
+    (define-key eglot-mode-map (kbd "C-æ l f") 'eglot-code-action-quickfix)
+    (define-key eglot-mode-map (kbd "C-æ l i") 'eglot-code-action-organize-imports)
+    (define-key eglot-mode-map (kbd "C-æ l r") 'eglot-rename))
+
+  (add-hook 'eglot-managed-mode-hook 'qrt/add-eglot-key-bindings)
+#+end_src
+
+** Some Keybindings
+
+Some default keybindings. Quickly start different shell types etc.
+
+#+begin_src elisp
+  (global-set-key (kbd "C-æ e") 'eval-print-last-sexp)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "C-æ w") 'fixup-whitespace)
+  (global-set-key (kbd "C-æ s e") 'eshell)
+  (global-set-key (kbd "C-æ s s") 'shell)
+  (global-set-key (kbd "C-æ s a") (lambda ()
+                                    (interactive)
+                                    (ansi-term "/bin/bash")))
+#+end_src
+
+** Sanityinc Tomorrow Themes
+
+Emacs comes with some good default themes. The sanityinc-tomorrow
+themes are nice to have around as well.
+
+#+begin_src elisp
+  (ensure-packages-installed '(color-theme-sanityinc-tomorrow))
+#+end_src
+
+** Avy
+
+Quickly jump the cursor to anywhere visible in the current emacs
+frame.
+
+#+begin_src elisp
+  (ensure-packages-installed '(avy))
+  (global-set-key (kbd "C-æ C-æ") 'avy-goto-char-2)
+#+end_src
+
+** Magit
+
+Use magit for git interaction.
+
+#+begin_src elisp
+  (ensure-packages-installed '(magit))
+  (global-set-key (kbd "C-x g") 'magit-status)
+#+end_src
+
+Magit has magit-extras that has autoloads, but until they are used,
+the magit-project-status feature of project.el, isn't available. Load
+the extras explicitly at startup.
+
+#+begin_src elisp
+  (require 'magit-extras)
+#+end_src
+
+** Ivy
+
+Ivy is a generic completion plugin with fuzzy search.
+
+#+begin_src elisp
+  (ensure-packages-installed '(ivy))
+  (ivy-mode 1)
+#+end_src
+
+Ivy has a tendency to exit when pressing a backspace when no more
+characters are left. This can be irritating, explicitly stopping with
+~C-g~ seems the better option.
+
+#+begin_src elisp
+  (setq ivy-on-del-error-function #'ignore)
+#+end_src
+
+** Counsel
+
+Counsel replaces some built in functionality with similar
+functionality that makes better usage of, or integrates better with,
+ivy.
+
+#+begin_src elisp
+  (ensure-packages-installed '(counsel))
+  (counsel-mode 1)
+#+end_src
+
+** Swiper
+
+Swiper is a nice alternative to isearch, using ivy to find text
+occurrences in a buffer. Override the keybinding for isearch, using
+swiper instead.
+
+#+begin_src elisp
+  (ensure-packages-installed '(swiper))
+  (global-set-key (kbd "C-s") 'swiper)
+#+end_src
+
+** Ag
+
+Ag is a frontend for the ~ag~ linux program, in Arch linux distributed
+via the ~the_silver_searcher~ package. To use the ag emacs package,
+make sure that the required functionality is available in the
+environment.
+
+#+begin_src elisp
+  (ensure-packages-installed '(ag))
+#+end_src
+
+** Paredit & Lisp improvements
+
+Use paredit ready to balance parentheses.
+
+#+begin_src elisp
+  (ensure-packages-installed '(paredit))
+#+end_src
+
+On first load, paredit sets up keybindings. The one for
+~paredit-convolute-sexp~, which is rarely used, is ~M-?~, which
+conflicts with the default keybinding for ~xref-find-references~ that
+is used frequently in ~eglot~. nill-ing the binding in paredits
+key-map re-enables the standard eglot behavior.
+
+#+begin_src elisp
+  (eval-after-load 'paredit
+    '(progn
+       (define-key paredit-mode-map (kbd "M-?") nil)))
+#+end_src
+
+~start-lisp-minor-modes~ enables some minor modes when invoked:
+
+| minor mode | explanation                                                            |
+|------------+------------------------------------------------------------------------|
+| paredit    | structural editing for lisps                                           |
+| show-paren | give focus on matching parenthesis                                     |
+| eldoc      | documentation heads up about function signatures etc in the minibuffer |
+
+#+begin_src elisp
+  (defun start-lisp-minor-modes ()
+    (paredit-mode 1)
+    (show-paren-mode 1)
+    (eldoc-mode 1))
+#+end_src
+
+Register a hook to start the lisp minor-modes for the emacs-lisp-mode.
+
+#+begin_src elisp
+  (add-hook 'emacs-lisp-mode-hook #'start-lisp-minor-modes)
+#+end_src
+
+** Qrt Theme control
+
+When themes are loaded, they are stacked on top of each other.
+Sometimes it makes sense to reset to default emacs theming and load a
+single theme on top of it (as the theme was probably designed for).
+
+#+begin_src elisp
+  (defun qrt/disable-all-themes ()
+    (interactive)
+    (mapcar #'disable-theme custom-enabled-themes))
+
+  (defun qrt/load-theme (theme)
+    (interactive
+     (list (intern (completing-read "Load custom theme: "
+                                    (mapcar #'symbol-name
+                                            (custom-available-themes))))))
+    (qrt/disable-all-themes)
+    (load-theme theme))
+
+  (global-set-key (kbd "C-æ t q") 'qrt/disable-all-themes)
+  (global-set-key (kbd "C-æ t l") 'qrt/load-theme)
+#+end_src
+
+** Qrt Font size
+
+~qrt/font-size~ sets a fontsize in percentage of the default size for
+all emacs windows.
+
+#+begin_src elisp
+  (defun qrt/font-size (s)
+    (interactive (list (read-number "font size: " 100)))
+    (set-face-attribute 'default nil :height s))
+
+  (global-set-key (kbd "C-æ f") 'qrt/font-size)
+#+end_src
+
+** Qrt Screen opaqueness
+
+~qrt/screen-opaqueness~ reads a value (in %) and allows for
+transparency control.
+
+#+begin_src elisp
+  (defun qrt/screen-opaqueness (v)
+    (interactive (list (read-number "opaqueness %: " 100)))
+    (set-frame-parameter nil 'alpha-background v))
+
+  (global-set-key (kbd "C-æ o") 'qrt/screen-opaqueness)
+#+end_src
+
+** Qrt Quick note taking with org mode
+
+A keybinding to open a specific notes file in org mode, ready to
+append a new root level heading.
+
+#+begin_src elisp
+  (defun qrt/take-quick-note ()
+    (interactive)
+    (find-file "~/notes/quick-notes.org")
+    (end-of-buffer)
+    (insert "* "))
+
+  (global-set-key (kbd "C-æ q") 'qrt/take-quick-note)
+#+end_src
+
+** Qrt Pomodoro
+
+The interactive ~qrt/start-pomodoro~ function starts a timer for a
+task to work on, and notfies when it expires.
+
+#+begin_src elisp
+  (defun qrt/notify-pomodoro-done
+      (task-name minutes)
+    (switch-to-buffer (get-buffer-create "*pomodoro*"))
+    (erase-buffer)
+    (sit-for 0)
+    (animate-string task-name 3)
+    (animate-string (concat  "Pomodoro (" (number-to-string minutes) " min) DONE!") 5)
+    (goto-char (point-min))
+    (help-mode-setup))
+
+  (defun qrt/start-pomodoro
+      (task-name minutes)
+    (interactive (list (read-string "task name: ")
+                       (read-number "minutes to work: " 25)))
+    (setq qrt/pomodoro-current-task-name task-name)
+    (setq qrt/pomodoro-current-task-time-minutes minutes)
+    (run-at-time
+     (* minutes 60)
+     nil
+     (lambda ()
+       (qrt/notify-pomodoro-done qrt/pomodoro-current-task-name
+                                 qrt/pomodoro-current-task-time-minutes))))
+#+end_src
+
+** Qrt ss8ch (ssh-agent integration)
+
+~qrt/ss8ch-add~ will prompt for an ssh key to unlock (found under
+~/.ssh). After successful authentication, the key is automatically
+available from new processes that run e.g. TRAMP, magit, etc.
+
+#+begin_src elisp
+  ;; ssh agent interop
+  ;; -----------------
+  (defconst qrt/ss8ch-agent-socket-var "SSH_AUTH_SOCK")
+  (defconst qrt/ss8ch-agent-process-id "SSH_AGENT_PID")
+  (defconst qrt/ss8ch-agent-search-end "; export")
+
+  (defun qrt/ss8ch-find-var-value-in-agent-response
+      (var-name response)
+    "Takes a var-name and the response of calling `ssh-agent` in a
+     shell environment. Finds the value for the given var-name in
+     the given agent response."
+    (save-match-data
+      (if (string-match (concat var-name "=\\([^;]+\\)" qrt/ss8ch-agent-search-end)
+                        response)
+          (match-string 1 response))))
+
+  (defun qrt/ss8ch-ensure-agent ()
+    "Checks if the environment contains the pid var for an ssh
+     agent. If not so, starts an ssh-agent process and captures its
+     output the configure the environment."
+    (when (not (getenv qrt/ss8ch-agent-process-id))
+      (let ((agent-response (shell-command-to-string "ssh-agent")))
+        (setenv qrt/ss8ch-agent-socket-var
+                (qrt/ss8ch-find-var-value-in-agent-response
+                 qrt/ss8ch-agent-socket-var
+                 agent-response))
+        (setenv qrt/ss8ch-agent-process-id
+                (qrt/ss8ch-find-var-value-in-agent-response
+                 qrt/ss8ch-agent-process-id
+                 agent-response)))
+      (message "ss8ch ~ agent started")))
+
+  (defun qrt/ss8ch-handle-passphrase-request (process process-message)
+    "Helper function to handle passphrase requests from the ssh-add
+     process."
+    (save-match-data
+      (if (string-match "passphrase.*:\\s *\\'" process-message)
+          (process-send-string process
+                               (concat (read-passwd process-message) "\n"))
+        (if (not (string-match "^\n+$" process-message))
+            (message (concat "ss8ch ~ " (string-trim process-message)))))))
+
+  (defun qrt/ss8ch-find-private-ssh-keys-in (directory)
+    "Returns a list of file paths under directory for private ssh
+     keys."
+    (remove nil (mapcar (lambda (file-name)
+                          (save-match-data
+                            (if (string-match "^\\([^.]+\\)\\.pub$" file-name)
+                                (concat directory (match-string 1 file-name)))))
+                        (directory-files directory))))
+
+  (defun qrt/ss8ch-add (key-file)
+    "Checks if an agent is registered in the environment. If not
+     so, an agent is started and registered. Then runs ssh-add to
+     add a key to the running SSH agent, using the minibuffer to
+     ask for the keys passphrase."
+    (interactive
+     (list (completing-read "Select ssh key to add: "
+                            (qrt/ss8ch-find-private-ssh-keys-in "~/.ssh/"))))
+    (qrt/ss8ch-ensure-agent)
+    (let (process)
+      (unwind-protect
+          (progn
+            (setq process (start-process  "ssh-add" nil
+                                          "ssh-add" (expand-file-name key-file)))
+            (set-process-filter process 'qrt/ss8ch-handle-passphrase-request)
+            (while (accept-process-output process)))
+        (if (eq (process-status process) 'run)
+            (kill-process process)))))
+
+#+end_src
+
+** Qrt Wrap in comment header
+
+~qrt/wrap-in-comment-header~ converts the current line in an
+out-commented header. The comment style used is dependent on the
+current mode of the active buffer.
+
+#+begin_src elisp
+  (defun qrt/wrap-in-comment-header ()
+    "Takes the line at point, upcases it, and wraps it in a formatted
+  comment (lisp style, ie. with ;;). Can for example be used to
+  format a title for a section of code that is comming."
+    (interactive)
+    (let* ((title (buffer-substring-no-properties (line-beginning-position)
+                                                  (line-end-position)))
+           (len (length title))
+           (beg)
+           (end))
+      (move-beginning-of-line 1)
+      (kill-line)
+      (insert "---" (make-string len ?-) "---\n")
+      (insert "-- " (upcase title)       " --\n")
+      (insert "---" (make-string len ?-) "---")
+      (previous-line 2)
+      (move-beginning-of-line nil)
+      (setq beg (point))
+      (next-line 2)
+      (move-end-of-line nil)
+      (setq end (point))
+      (comment-region beg end)))
+
+  (global-set-key (kbd "C-æ c") 'qrt/wrap-in-comment-header)
+#+end_src
+
+** Qrt Pretty print html
+
+~qrt/html-pretty-print~ operates on the active region. It parses html
+in the region and replaces it with a 'rendered' version.
+
+#+begin_src elisp
+  (defun qrt/html-pretty-print (begin end)
+    (interactive "r")
+    (let ((orig-buf (current-buffer))
+          (dom (libxml-parse-html-region begin end)))
+      (with-temp-buffer
+        (shr-insert-document dom)
+        (let ((tmp-buf (current-buffer)))
+          (set-buffer orig-buf)
+          (replace-region-contents
+           begin
+           end
+           (lambda ()
+             tmp-buf))))))
+#+end_src
+
+* Clojure
+:PROPERTIES:
+:header-args: :tangle "dot-emacs-clojure.el"
+:END:
+** Install clojure-mode and cider
+
+Ensure clojure-mode and cider are installed.
+
+#+begin_src elisp
+  (ensure-packages-installed '(clojure-mode cider))
+#+end_src
+
+** Do not display the help banner on startup
+#+begin_src elisp
+  (setq cider-repl-display-help-banner nil)
+
+#+end_src
+
+** Keep repl history
+
+By default the cider REPL has no history memory between sessions.
+Let's keep history between REPL startups.
+
+#+begin_src elisp
+  (setq cider-repl-history-file "~/.cider-repl-history")
+#+end_src
+
+** Turn pretty printing in the REPL on
+
+#+begin_src elisp
+  (setq cider-repl-use-pretty-printing t)
+#+end_src
+
+** Enbale lisp-minor-modes for clojure/cider modes
+
+Register hooks to start minor-modes for clojure and cider modes.
+clojure-mode-hook seems to be ok with start-lisp-minor-modes, even
+though cider isn't running yet for eldoc support etc.
+
+#+begin_src elisp
+  (add-hook 'clojure-mode-hook #'start-lisp-minor-modes)
+  (add-hook 'cider-repl-mode-hook #'start-lisp-minor-modes)
+  (add-hook 'cider-mode-hook #'start-lisp-minor-modes)
+#+end_src
+
+** Evaluate toplevels inside (comment) forms
+
+#+begin_src elisp
+  (setq clojure-toplevel-inside-comment-form t)
+#+end_src
+
+** Eglot extra config
+
+~eglot~ requires one to install the language server. It doesn't do
+this automatically like lsp-mode does. For clojure, installing the
+language server via AUR was enough to make eglot work. Just execute
+~M-x eglot~ in a clojure buffer.
+
+We need an extra package for now, to navigate inside of jar files, and
+have it setup itself.
+
+#+begin_src elisp
+  (ensure-packages-installed '(jarchive))
+  (jarchive-mode)
+#+end_src
+
+Do not use xref integration with cider, it conflicts when eglot is
+started. When xref usage is disabled, cider still tries to bind some
+keybindings normally used by xref, which would also make them unusable
+from eglot. On the other hand are ciders versions handy, so let's
+rebind them to unused keybindings.
+
+#+begin_src elisp
+  (setq cider-use-xref nil)
+
+  (eval-after-load 'cider
+    '(progn
+       (define-key cider-mode-map (kbd "M-.") nil)
+       (define-key cider-mode-map (kbd "M-,") nil)
+       (define-key cider-mode-map (kbd "M-o") #'cider-find-var)
+       (define-key cider-mode-map (kbd "M-p") #'cider-pop-back)))
+#+end_src
+
+** Take <Enter> back from paredit
+
+Cider has the nice feature that "RET" (enter key) normally commands
+the cider repl to evaluate the current input at the prompt (if it is
+balanced, but this should always be the case with paredit actived).
+~paredit-mode~, though, overrides this nice behavior; paredit-mode
+gets loaded as a minor mode, via a hook, when the cider-repl
+major-mode is activated, and it redefines the key-binding for <enter>
+to lesser desired behavior. Let's remove that binding from paredits
+mode-map, so that the default cider keybinding becomes active again.
+
+#+begin_src elisp
+  (eval-after-load 'paredit
+    '(progn
+       (define-key paredit-mode-map (kbd "RET") nil)))
+#+end_src
+
+** Integration with org-babel
+
+Improve literate programming experience with clojure in org mode (org
+babel for clojure).
+
+#+begin_src elisp
+  (require 'ob-clojure)
+  (setq org-babel-clojure-backend 'cider)
+#+end_src
+
+** Qrt Reindent Sql string
+
+When moving the first line of a sql string in clojure mode, the rest
+of the lines in the sql string can be reindented with the following
+function.
+
+#+begin_src elisp
+  (defun qrt/indent-sql ()
+    (interactive)
+    (let* ((region-end (progn
+                         (search-forward "\"")
+                         (point)))
+           (region-start (progn
+                           (backward-char)
+                           (search-backward "\"")
+                           (indent-for-tab-command)
+                           (point)))
+           (lines-to-handle
+            (- (count-lines region-start region-end)
+               1))
+           (start-first-line
+            (progn
+              (forward-char)
+              (point)))
+           (indent-first-line
+            (progn
+              (move-beginning-of-line nil)
+              (- start-first-line (point))))
+           (start-second-line
+            (progn
+              (next-line)
+              (back-to-indentation)
+              (point)))
+           (indent-second-line
+            (progn
+              (move-beginning-of-line nil)
+              (- start-second-line (point))))
+           (chars-to-remove
+            (- indent-second-line
+               indent-first-line)))
+      (save-excursion
+        (save-restriction
+          (narrow-to-region region-start region-end)
+          (while (> lines-to-handle 0)
+            (move-beginning-of-line nil)
+            (if (> chars-to-remove 0)
+                (delete-char chars-to-remove)
+              (insert-char (string-to-char " ") (- chars-to-remove)))
+            (next-line)
+            (setq lines-to-handle
+                  (1- lines-to-handle)))))))
+#+end_src
+
+** Qrt Insert clj UUID
+
+Insert a tag literal for uuid with a value, useful when creating
+sample data in a repl or test.
+
+#+begin_src elisp
+  (defun qrt/uuid
+      ()
+    (interactive)
+    (insert "#uuid \"")
+    (insert (string-trim (shell-command-to-string "uuidgen")))
+    (insert "\""))
+
+  (global-set-key (kbd "C-æ u") 'qrt/uuid)
+#+end_src
+
+* Currently disabled (no tangle)                                  :obsoleted:
+** company mode
+
+Company was used previously, but replaced by ~ivy~.
+
+#+begin_src elisp :tangle no
+  (ensure-packages-installed '(company))
+
+  (setq company-dabbrev-downcase nil)
+  ;;(setq company-minimum-prefix-length 1)
+  (setq company-idle-delay 0)
+  ;;(setq company-tooltip-idle-delay 0)
+
+  (defun start-company-mode ()
+    (company-mode 1))
+
+  (add-hook 'org-mode-hook 'start-company-mode)
+#+end_src
+
+** markdown mode
+
+#+begin_src elisp :tangle no
+  (ensure-packages-installed '(markdown-mode))
+#+end_src
+
+** projectile
+
+Currently not being used, replaced by built-in project.el package
+instead.
+
+#+begin_src elisp :tangle no
+  (ensure-packages-installed '(projectile))
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (setq projectile-completion-system 'ivy)
+#+end_src
+
+** Font type control
+
+Set the default font type.
+
+#+begin_src elisp :tangle no
+  (set-face-attribute 'default nil
+                      :height 120
+                      :family "Ubuntu Mono")
+#+end_src
+
+** Speed type
+
+A package to test typing speed, can download text or word lists for
+practice, but also provides possibility to use the text of a custom
+buffer.
+
+#+begin_src elisp :tangle no
+  (ensure-packages-installed '(speed-type))
+#+end_src
+
+** artist mode with ditaa
+
+To make ditaa work with org blocks in artist mode (language ditaa)
+ditaa must be installed on the machine somewhere. Disabled for now.
+
+#+begin_src elisp :tangle no
+  (require 'ob-ditaa)
+  (setq org-ditaa-jar-path "/usr/share/java/ditaa/ditaa-0.11.jar")
+#+end_src
+
+** A helper to time the execution of elisp functionality
+
+Not interactive. Can be used with M-: (eval-expression) though to time
+interactive and non interactive functions. Emits a message showing the
+computation and how long it took to complete.
+
+#+begin_src elisp :tangle no
+  (defmacro qrt/measure-time (&rest body)
+    "Compute body and message the time it took to compute it."
+    `(let ((start (current-time))
+           (result ,(cons 'progn body)))
+       (message "computation %s took %.06f seconds"
+                (quote ,body)
+                (float-time (time-since start)))
+       result))
+#+end_src
+
+** Leingen pedantic abort
+
+Previously, the following elisp was included (but now excluded) in the
+setup of cider to fix problems with leiningens' ~:pedantic :abort~.
+Instead an override is now made in ~~/.lein/profiles~ to override the
+pedantic value to ~:ranges~.
+
+#+begin_src elisp :tangle no
+  (setq cider-inject-dependencies-at-jack-in nil)
+#+end_src
