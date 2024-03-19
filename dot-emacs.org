@@ -26,21 +26,21 @@ the configuration process.
 
 Of course, it's an emacs configuration!! I think that this
 configuration is rather minimalistic, relying mostly on built-in emacs
-functionality. As a bonus, emacs should start up rather fastly with
+functionality. As a bonus, emacs should start up rather quickly with
 this configuration.
 
 Names of custom defined functions start with ~qrt/~ to limit the
 possibility of having conflicts with function names in other packages.
 
-In a same manner, custom keybindings typicaly start with ~C-æ~ as
-this special danish character is unlikely to be used by any package.
+In a same manner, custom keybindings typically start with ~C-æ~ as
+this danish character is unlikely to be used by any package.
 
 ** No theme?
 
 No theme is auto-loaded from this config (some are installed though).
 I prefer to add a ~load-theme~ call in the emacs init file (after the
-example pre-lude above) as this allows usage of different themes on
-different machines, without the need to first onload a previously
+example prelude above) as this allows usage of different themes on
+different machines, without the need to first unload a previously
 loaded theme.
 
 * Base
@@ -1029,7 +1029,7 @@ computation and how long it took to complete.
        result))
 #+end_src
 
-** Leingen pedantic abort
+** Leiningen pedantic abort
 
 Previously, the following elisp was included (but now excluded) in the
 setup of cider to fix problems with leiningens' ~:pedantic :abort~.
