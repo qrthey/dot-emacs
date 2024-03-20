@@ -19,8 +19,8 @@ Example content of ~/.emacs
   ;; (load-file "PATH-TO-THIS-REPOSITORY/dot-emacs-clojure.el")
 #+end_src
 
-Restarting emacs should then automatically bootstrap it and complete
-the configuration process.
+Restarting emacs should then automatically bootstrap the configuration
+process.
 
 ** Opinionated?
 
@@ -252,11 +252,10 @@ loaded for org-babel.
 
 **** Improve the looks of org-mode
 
-Org bullets and a bit of regex go a long way to have nicer headings
-and items lists. When also using latex in org-buffers.
+Org bullets and a bit of regex go a long way to have nicer bullets
+points for headings list items.
 
 #+begin_src elisp
-
   (ensure-packages-installed '(org-bullets))
 
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -270,18 +269,15 @@ and items lists. When also using latex in org-buffers.
    'org-mode
    '(("^ *\\([+]\\) "
       (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
-
 #+end_src
 
-Sometimes the inline rendered latex output is rather small, but we can
-bump the scale factor.
+When using latex in org-buffers. Sometimes the inline rendered latex
+output is rather small, but we can bump the scale factor.
 
 #+begin_src elisp
   (add-hook 'org-mode-hook
             (lambda () (setq org-format-latex-options
                              (plist-put org-format-latex-options :scale 2.0))))
-
-
 #+end_src
 
 **** Org Tree Slide for slide shows
