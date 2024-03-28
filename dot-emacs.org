@@ -245,7 +245,7 @@ the document, as they risk being invisible on the screen. So when
 buffers show all content.
 
  #+begin_src elisp
-   (add-hook 'ediff-prepare-buffer-hook 'org-show-all)
+   (add-hook 'ediff-prepare-buffer-hook 'org-fold-show-all)
  #+end_src
 
 **** Speed commands are very useful
