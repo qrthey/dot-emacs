@@ -249,9 +249,24 @@ buffers show all content.
  #+end_src
 
 **** Speed commands are very useful
+~org-use-speed-commands~ enables single key actions for navigation and
+editing within org buffers when the cursor is a specific places (such
+as the start of a line that defines a heading). To learn more about
+the actions that are avaible, run ~org-speed-command-help~.
 
 #+begin_src elisp
   (setq org-use-speed-commands t)
+#+end_src
+
+To have these speed commands available as soon as possible, try to
+navigate to the first heading in an org buffer when org-mode is
+activated.
+
+#+begin_src elisp
+  (add-hook 'org-mode-hook
+            (lambda
+              ()
+              (org-next-visible-heading 1)))
 #+end_src
 
 **** enable auto-fill-mode when org mode is activated
