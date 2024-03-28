@@ -189,6 +189,27 @@ default as the ~insert-directory-program~ on linux.
   (setq dired-listing-switches "-alh --group-directories-first")
 #+end_src
 
+*** ediff
+Configure some better defaults for ~ediff~.
+
+By default ~ediff~ splits the windows vertically (on top of each
+other). Displaying buffers that are compared side-by-side seams more
+natural.
+
+#+begin_src elisp
+  ;; better defaults for ediff
+(setq ediff-split-window-function 'split-window-horizontally)
+#+end_src
+
+Another default behavior of ~ediff~ is that it will open up a new
+frame in graphical (non-terminal) Emacs. Having the ediff command
+window inside of the existing frame is preferred here.
+
+#+begin_src elisp
+  ;; better defaults for ediff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+end_src
+
 *** eshell
 
 Register programs that should not run inside of eshell, because they
@@ -202,6 +223,7 @@ is launched to run the program in.
               (dolist (prog '("bash" "vim" "ranger" "tmux" "htop"))
                 (add-to-list 'eshell-visual-commands prog))))
 #+end_src
+
 *** org mode
 **** Make org-mode the default mode for a new buffer
 
