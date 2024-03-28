@@ -448,6 +448,20 @@ in handily. The following functionality is made available with prefix
   (add-hook 'eglot-managed-mode-hook 'qrt/add-eglot-key-bindings)
 #+end_src
 
+*** eldoc
+
+~eldoc~ displays documentation in the minibuffer in e.g. programming
+modes, like function signatures etc. It can be undesired that the
+minibuffer grows and shrinks all the time when moving around in a code
+file (happens especially when using with eglot). The following limitws
+eldoc use just a single line. In a buffer backed by eglot, it is still
+possible to run ~eldoc-doc-buffer~ to pop up a buffer with all
+documentation.
+
+#+begin_src elisp
+  (setq eldoc-echo-area-use-multiline-p nil)
+#+end_src
+
 ** Some Keybindings
 
 Some default keybindings. Quickly start different shell types etc.
