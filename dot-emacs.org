@@ -448,6 +448,15 @@ in handily. The following functionality is made available with prefix
   (add-hook 'eglot-managed-mode-hook 'qrt/add-eglot-key-bindings)
 #+end_src
 
+*** flymake next error shortcut
+
+Eglot makes usage of built-in package ~flymake~. A particular useful
+function to jump to the next lsp warning/error gets a keybinding here.
+
+#+begin_src elisp
+  (global-set-key (kbd "C-æ n") 'flymake-goto-next-error)
+#+end_src
+
 *** eldoc
 
 ~eldoc~ displays documentation in the minibuffer in e.g. programming
