@@ -236,6 +236,18 @@ is launched to run the program in.
   (setq org-startup-indented t)
 #+end_src
 
+**** Ensure all content visible when starting ediff
+
+If an org document default to fold its headings (e.g. startup option
+'overview') then this is not ideal when navigation changed hunks in
+the document, as they risk being invisible on the screen. So when
+~ediff~ has setup the buffers for the diff session, lets ensure org
+buffers show all content.
+
+ #+begin_src elisp
+   (add-hook 'ediff-prepare-buffer-hook 'org-show-all)
+ #+end_src
+
 **** Speed commands are very useful
 
 #+begin_src elisp
