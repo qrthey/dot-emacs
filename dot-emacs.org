@@ -230,11 +230,6 @@ is launched to run the program in.
 
 *** org mode
 
-**** Make org-mode the default mode for a new buffer
-
-#+begin_src elisp
-  (setq-default major-mode 'org-mode)
-#+end_src
 **** Use indentation by default
 
 #+begin_src elisp
@@ -1021,6 +1016,18 @@ sample data in a repl or test.
 #+end_src
 
 * Currently disabled (no tangle)                                  :obsoleted:
+
+** Make org-mode the default mode for a new buffer
+
+This was used to have new tmp buffers automatically load org mode. But
+it was observed that this also could influence other scenarios. For
+example, the buffer to edit magit commit messages (COMMIT_EDITMSG)
+seemed to load org-mode stuff (and org minor modes such as indent and
+bullets), even though the buffer once displayed is in ~text~ mode.
+
+#+begin_src elisp :tangle no
+  (setq-default major-mode 'org-mode)
+#+end_src
 
 ** company mode
 
