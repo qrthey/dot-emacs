@@ -47,6 +47,7 @@ loaded theme.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-base.el"
 :END:
+
 ** Log basic information during startup of emacs
 
 Log when emacs was started, and whether it is running as a daemon or a
@@ -91,6 +92,7 @@ configured package-archives.
 #+end_src
 
 ** Configuration of standard emacs
+
 *** Don't show the splash-screen at startup
 
 #+begin_src elisp
@@ -227,6 +229,7 @@ is launched to run the program in.
 #+end_src
 
 *** org mode
+
 **** Make org-mode the default mode for a new buffer
 
 #+begin_src elisp
@@ -416,6 +419,7 @@ presentation mode with custom key-bindings.
   (add-hook 'org-tree-slide-play-hook #'qrt/init-org-tree-slide)
   (add-hook 'org-tree-slide-stop-hook #'qrt/finish-org-tree-slide)
 #+end_src
+
 *** eglot
 
 ~eglot~ is an emacs built-in package that interacts with lsp servers.
@@ -817,6 +821,7 @@ in the region and replaces it with a 'rendered' version.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-clojure.el"
 :END:
+
 ** Install clojure-mode and cider
 
 Ensure clojure-mode and cider are installed.
@@ -993,6 +998,7 @@ sample data in a repl or test.
 #+end_src
 
 * Currently disabled (no tangle)                                  :obsoleted:
+
 ** company mode
 
 Company was used previously, but replaced by ~ivy~.
