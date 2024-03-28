@@ -451,7 +451,9 @@ Eglot makes usage of built-in package ~flymake~. A particular useful
 function to jump to the next lsp warning/error gets a keybinding here.
 
 #+begin_src elisp
-  (global-set-key (kbd "C-æ n") 'flymake-goto-next-error)
+  (eval-after-load 'flymake
+    '(progn
+       (define-key flymake-mode-map (kbd "C-æ n") 'flymake-goto-next-error)))
 #+end_src
 
 *** eldoc
