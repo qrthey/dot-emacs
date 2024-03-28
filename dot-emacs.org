@@ -47,7 +47,6 @@ loaded theme.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-base.el"
 :END:
-
 ** Log basic information during startup of emacs
 
 Log when emacs was started, and whether it is running as a daemon or a
@@ -92,7 +91,6 @@ configured package-archives.
 #+end_src
 
 ** Configuration of standard emacs
-
 *** Don't show the splash-screen at startup
 
 #+begin_src elisp
@@ -137,9 +135,11 @@ blinking.
 #+end_src
 
 *** Do not default to electric-indent-mode
+
 #+begin_src elisp
   (electric-indent-mode -1)
 #+end_src
+
 *** Prefer spaces for indentation, not TABs
 
 Emacs seems to be intelligent about this, and in the case of e.g.
@@ -194,6 +194,7 @@ file sizes are reported.
 #+end_src
 
 *** ediff
+
 Configure some better defaults for ~ediff~.
 
 By default ~ediff~ splits the windows vertically (on top of each
@@ -229,7 +230,6 @@ is launched to run the program in.
 #+end_src
 
 *** org mode
-
 **** Use indentation by default
 
 #+begin_src elisp
@@ -249,6 +249,7 @@ buffers show all content.
  #+end_src
 
 **** Speed commands are very useful
+
 ~org-use-speed-commands~ enables single key actions for navigation and
 editing within org buffers when the cursor is a specific places (such
 as the start of a line that defines a heading). To learn more about
@@ -330,6 +331,7 @@ output is rather small, but we can bump the scale factor.
 #+end_src
 
 **** Org Tree Slide for slide shows
+
 ~org-tree-slide~ is a package that allows for using an org document as
 a presentation/slide-show.
 
@@ -839,7 +841,6 @@ in the region and replaces it with a 'rendered' version.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-clojure.el"
 :END:
-
 ** Install clojure-mode and cider
 
 Ensure clojure-mode and cider are installed.
@@ -849,6 +850,7 @@ Ensure clojure-mode and cider are installed.
 #+end_src
 
 ** Do not display the help banner on startup
+
 #+begin_src elisp
   (setq cider-repl-display-help-banner nil)
 
@@ -1016,7 +1018,6 @@ sample data in a repl or test.
 #+end_src
 
 * Currently disabled (no tangle)                                  :obsoleted:
-
 ** Make org-mode the default mode for a new buffer
 
 This was used to have new tmp buffers automatically load org mode. But
