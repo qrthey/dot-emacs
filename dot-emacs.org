@@ -180,10 +180,12 @@ process.
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
-*** dired: sort directories first and use human readable reported file sizes
+*** dired
 
 The following switches are passed to the ~ls~ command that is used by
-default as the ~insert-directory-program~ on linux.
+default as the ~insert-directory-program~ on linux. This makes
+directories to appear in the top of the listing, and human readable
+file sizes are reported.
 
 #+begin_src elisp
   (setq dired-listing-switches "-alh --group-directories-first")
