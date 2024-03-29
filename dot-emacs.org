@@ -4,23 +4,66 @@
 
 * About Dot Emacs
 
-Tangling (~org-babel-tangle~) this document will emit 2 files,
-~dot-emacs-base.el~ and ~dot-emacs.clojure.el~. In a newly, blank,
-installed emacs it should then be sufficient to load these files from
-the init file (e.g. ~/.emacs). The base file is required and must be
-loaded first. The clojure file is only useful when doing clojure or
-clojurescript development and can be loaded after the base
-configuration file.
+This is my own, personal, opinionated, Emacs config. The document
+might serve as an inspiration. Or just to copy some specific
+functionality from it to ones own config.
+
+The [[Base]] section contains configuration that I want in any Emacs
+environment that I use.
+
+As I work with clojure on a number of different machines there is also
+a [[Clojure]] section that I will include on such machines.
+
+On some machines, I will also have extra custom elisp code specific to
+a particular customer, such as ways of interacting with their ticket
+system, generating otp codes, etc. This code is not included here, but
+some of it might be reworked to new sections in the future.
+
+** Setup
+
+Opening this file in Emacs with the org major mode enables to tangle
+it (~org-babel-tangle~). this document will emit 2 elisp libraries;
+the files ~dot-emacs-base.el~ and ~dot-emacs.clojure.el~.
+
+The following source block is not part of the configuration (not
+tangled) but can be executed from within org mode to do the tangling
+of the current document (use C-c C-c when the cursor is in the source
+block) . The echo area will display the names of the generated files.
+
+#+begin_src elisp :tangle no :results silent
+  (org-babel-tangle)
+#+end_src
+
+In a newly, blank, installed emacs it should then be sufficient to
+load these libraries from the init file (e.g. ~/.emacs). The base file
+is required and must be loaded first. The clojure file is only useful
+when doing clojure or clojurescript development and can be loaded
+after the base configuration file (it is depending on functionality
+defined in the base file which must therefor be loaded first).
 
 Example content of ~/.emacs
 
-#+begin_src elisp
-  (load-file "PATH-TO-THIS-REPOSITORY/dot-emacs-base.el")
-  ;; (load-file "PATH-TO-THIS-REPOSITORY/dot-emacs-clojure.el")
-#+end_src
+#+begin_export ascii
+  (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
+  (load-library "dot-emacs-base")
+  (load-library "dot-emacs-clojure")
+#+end_export
 
 Restarting emacs should then automatically bootstrap the configuration
-process.
+process. To reset an existing previous emacs configuration first, it
+should be possible to delete all folders under ~/.emacs.d first and
+then start the setup process described here.
+
+As we use ~load-library~, and not ~load-file~, we can also take
+advantage of emacs native compilation on our own elisp. To do so, just
+execute the following source block in stead of the one used above for
+just tangling this document.
+
+#+begin_src elisp :tangle no :results silent
+  (org-babel-tangle)
+  (native-compile "./dot-emacs-base.el")
+  (native-compile "./dot-emacs-clojure.el")
+#+end_src
 
 ** Opinionated?
 
@@ -518,7 +561,8 @@ the magit-project-status feature of project.el, isn't available. Load
 the extras explicitly at startup.
 
 #+begin_src elisp
-  (require 'magit-extras)
+  (with-eval-after-load 'project
+    (require 'magit-extras))
 #+end_src
 
 ** Ivy
@@ -670,7 +714,7 @@ append a new root level heading.
   (defun qrt/take-quick-note ()
     (interactive)
     (find-file "~/notes/quick-notes.org")
-    (end-of-buffer)
+    (goto-char (point-max))
     (insert "* "))
 
   (global-set-key (kbd "C-æ q") 'qrt/take-quick-note)
@@ -807,10 +851,10 @@ current mode of the active buffer.
       (insert "---" (make-string len ?-) "---\n")
       (insert "-- " (upcase title)       " --\n")
       (insert "---" (make-string len ?-) "---")
-      (previous-line 2)
+      (forward-line -2)
       (move-beginning-of-line nil)
       (setq beg (point))
-      (next-line 2)
+      (forward-line 2)
       (move-end-of-line nil)
       (setq end (point))
       (comment-region beg end)))
@@ -980,7 +1024,7 @@ function.
               (- start-first-line (point))))
            (start-second-line
             (progn
-              (next-line)
+              (forward-line)
               (back-to-indentation)
               (point)))
            (indent-second-line
@@ -998,7 +1042,7 @@ function.
             (if (> chars-to-remove 0)
                 (delete-char chars-to-remove)
               (insert-char (string-to-char " ") (- chars-to-remove)))
-            (next-line)
+            (forward-line)
             (setq lines-to-handle
                   (1- lines-to-handle)))))))
 #+end_src
