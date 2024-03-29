@@ -43,11 +43,11 @@ defined in the base file which must therefor be loaded first).
 
 Example content of ~/.emacs
 
-#+begin_export ascii
+#+begin_example
   (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
   (load-library "dot-emacs-base")
   (load-library "dot-emacs-clojure")
-#+end_export
+#+end_example
 
 Restarting emacs should then automatically bootstrap the configuration
 process. To reset an existing previous emacs configuration first, it
