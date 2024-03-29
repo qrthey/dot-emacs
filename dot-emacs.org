@@ -54,10 +54,10 @@ process. To reset an existing previous emacs configuration first, it
 should be possible to delete all folders under ~/.emacs.d first and
 then start the setup process described here.
 
-As we use ~load-library~, and not ~load-file~, we can also take
-advantage of emacs native compilation on our own elisp. To do so, just
-execute the following source block in stead of the one used above for
-just tangling this document.
+As ~load-library~ is used, and not ~load-file~, it is possible to
+native compile the elisp of the configuration. To do so, just execute
+the following source block in stead of the one used above for just
+tangling this document.
 
 #+begin_src elisp :tangle no :results silent
   (defun qrt/native-compile-file (file-name)
