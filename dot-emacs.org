@@ -60,9 +60,16 @@ execute the following source block in stead of the one used above for
 just tangling this document.
 
 #+begin_src elisp :tangle no :results silent
+  (defun qrt/native-compile-file (file-name)
+    (let* ((byte+native-compile t)
+           (byte-to-native-output-buffer-file nil)
+           (eln (native-compile file-name)))
+      (when eln
+        (comp-write-bytecode-file eln))))
+
   (org-babel-tangle)
-  (native-compile "./dot-emacs-base.el")
-  (native-compile "./dot-emacs-clojure.el")
+  (qrt/native-compile-file "./dot-emacs-base.el")
+  (qrt/native-compile-file "./dot-emacs-clojure.el")
 #+end_src
 
 ** Opinionated?
