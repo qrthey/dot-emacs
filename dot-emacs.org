@@ -46,7 +46,7 @@ Example content of ~/.emacs
 #+begin_example
   (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
   (load-library "dot-emacs-base")
-  (load-library "dot-emacs-clojure")
+  ;; (load-library "dot-emacs-clojure")
 #+end_example
 
 Restarting emacs should then automatically bootstrap the configuration
