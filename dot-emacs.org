@@ -712,13 +712,35 @@ A keybinding to open a specific notes file in org mode, ready to
 append a new root level heading.
 
 #+begin_src elisp
-  (defun qrt/take-quick-note ()
+  (defun qrt/open-quick-notes ()
     (interactive)
     (find-file "~/notes/quick-notes.org")
-    (goto-char (point-max))
-    (insert "* "))
+    (widen)
+    (recenter-top-bottom))
 
-  (global-set-key (kbd "C-æ q") 'qrt/take-quick-note)
+  (defun qrt/take-quick-note ()
+    (interactive)
+    (qrt/open-quick-notes)
+    (goto-char (point-max))
+    (org-insert-heading nil nil t)
+    (org-narrow-to-subtree))
+
+  (defun qrt/quick-notes (arg)
+    "Provides quick interaction for note taking.
+
+  Without the prefix ARG set, opens the quick-notes org file, adds
+  a new toplevel heading in the bottom and narrows the document to
+  the new heading. Ready to capture an idea without any
+  distractions.
+
+  With prefix ARG set, also opens the quick-notes org file to just
+  shows all the notes. Ready for refilling or other actions."
+    (interactive "P")
+    (if arg
+        (qrt/open-quick-notes)
+      (qrt/take-quick-note)))
+
+  (global-set-key (kbd "C-æ q") 'qrt/quick-notes)
 #+end_src
 
 ** Qrt Pomodoro
