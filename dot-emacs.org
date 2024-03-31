@@ -1,6 +1,7 @@
 #+TITLE: Dot Emacs
 #+STARTUP: indent overview
 #+OPTIONS: num:nil toc:nil html-postamble:nil
+#+PROPERTY: header-args:elisp :lexical t
 
 * About Dot Emacs
 
@@ -97,6 +98,10 @@ loaded theme.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-base.el"
 :END:
+** Use lexical binding for the generated configuration
+#+begin_src elisp
+  ;; -*- lexical-binding: t -*-
+#+end_src
 ** Log basic information during startup of emacs
 
 Log when emacs was started, and whether it is running as a daemon or a
@@ -894,6 +899,10 @@ in the region and replaces it with a 'rendered' version.
 :PROPERTIES:
 :header-args: :tangle "dot-emacs-clojure.el"
 :END:
+** Use lexical binding for the generated configuration
+#+begin_src elisp
+  ;; -*- lexical-binding: t -*-
+#+end_src
 ** Install clojure-mode and cider
 
 Ensure clojure-mode and cider are installed.
