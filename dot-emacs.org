@@ -39,18 +39,19 @@ for performance reasons. In an emacs installation with native
 compilation enabled, the libraries will on first load also be native
 compiled for even faster future execution.
 
-In the emacs init file (like ~/.emacs), create a section with the
-following content to load the desired elisp libraries. The
+Create a blank emacs init file (e.g. ~/.emacs) with content reflecting
+the following example to load the desired elisp libraries. The
 ~dot-emacs-base~ library is required and must be loaded first. The
 ~dot-emacs-clojure~ library is only useful when doing clojure or
-clojurescript development and can be loaded after the base
-configuration file (it is depending on functionality defined in the
-~dot-emacs-base~ library, which must therefor be loaded first).
+clojurescript development (it is depending on functionality defined in
+the ~dot-emacs-base~ library, which must therefor be loaded first).
 
-Be sure to change to PATH-TO-THIS-REPOSITORY to point to the root
-directory of this git repository.
+Be sure to change to PATH-TO-THIS-REPOSITORY in the example to point
+to the root directory of this git repository.
 
 #+begin_example
+  ;; -*- lexical-binding: t -*-
+
   (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
   (load-library "dot-emacs-base")
   ;; (load-library "dot-emacs-clojure")
