@@ -22,27 +22,33 @@ some of it might be reworked to new sections in the future.
 
 ** Setup
 
-Opening this file in Emacs with the org major mode enables to tangle
-it (~org-babel-tangle~). this document will emit 2 elisp libraries;
-the files ~dot-emacs-base.el~ and ~dot-emacs.clojure.el~.
-
-The following source block is not part of the configuration (not
-tangled) but can be executed from within org mode to do the tangling
-of the current document (use C-c C-c when the cursor is in the source
-block) . The echo area will display the names of the generated files.
+Tangling this document will emit 2 elisp libraries; the files
+~dot-emacs-base.el~ and ~dot-emacs.clojure.el~. Evaluating the
+following code block (use C-c C-c when the cursor is in the source
+block), which itself is not tangled, will after tangling also
+byte-compile the libraries.
 
 #+begin_src elisp :tangle no :results silent
   (org-babel-tangle)
+  (byte-compile-file "./dot-emacs-base.el")
+  (byte-compile-file "./dot-emacs-clojure.el")
 #+end_src
 
-In a newly, blank, installed emacs it should then be sufficient to
-load these libraries from the init file (e.g. ~/.emacs). The base file
-is required and must be loaded first. The clojure file is only useful
-when doing clojure or clojurescript development and can be loaded
-after the base configuration file (it is depending on functionality
-defined in the base file which must therefor be loaded first).
+When loading a library, emacs will prefer the byte-compiled version
+for performance reasons. In an emacs installation with native
+compilation enabled, the libraries will on first load also be native
+compiled for even faster future execution.
 
-Example content of ~/.emacs
+In the emacs init file (like ~/.emacs), create a section with the
+following content to load the desired elisp libraries. The
+~dot-emacs-base~ library is required and must be loaded first. The
+~dot-emacs-clojure~ library is only useful when doing clojure or
+clojurescript development and can be loaded after the base
+configuration file (it is depending on functionality defined in the
+~dot-emacs-base~ library, which must therefor be loaded first).
+
+Be sure to change to PATH-TO-THIS-REPOSITORY to point to the root
+directory of this git repository.
 
 #+begin_example
   (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
@@ -50,28 +56,10 @@ Example content of ~/.emacs
   ;; (load-library "dot-emacs-clojure")
 #+end_example
 
-Restarting emacs should then automatically bootstrap the configuration
-process. To reset an existing previous emacs configuration first, it
-should be possible to delete all folders under ~/.emacs.d first and
-then start the setup process described here.
-
-As ~load-library~ is used, and not ~load-file~, it is possible to
-native compile the elisp of the configuration. To do so, just execute
-the following source block in stead of the one used above for just
-tangling this document.
-
-#+begin_src elisp :tangle no :results silent
-  (defun qrt/native-compile-file (file-name)
-    (let* ((byte+native-compile t)
-           (byte-to-native-output-buffer-file nil)
-           (eln (native-compile file-name)))
-      (when eln
-        (comp-write-bytecode-file eln))))
-
-  (org-babel-tangle)
-  (qrt/native-compile-file "./dot-emacs-base.el")
-  (qrt/native-compile-file "./dot-emacs-clojure.el")
-#+end_src
+Restarting a blank emacs installation should then automatically
+bootstrap the configuration process. To reset an existing previous
+emacs configuration, it is possible to delete all sub-folders under
+~/.emacs.d first and then restart emacs.
 
 ** Opinionated?
 
