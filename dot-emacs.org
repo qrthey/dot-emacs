@@ -32,6 +32,7 @@ byte-compile the libraries.
   (org-babel-tangle)
   (byte-compile-file "./dot-emacs-base.el")
   (byte-compile-file "./dot-emacs-clojure.el")
+  (byte-compile-file "./dot-emacs-scheme.el")
 #+end_src
 
 When loading a library, emacs will prefer the byte-compiled version
@@ -55,6 +56,7 @@ to the root directory of this git repository.
   (add-to-list 'load-path "PATH-TO-THIS-REPOSITORY")
   (load-library "dot-emacs-base")
   ;; (load-library "dot-emacs-clojure")
+  ;; (load-library "dot-emacs-scheme")
 #+end_example
 
 Restarting a blank emacs installation should then automatically
@@ -88,9 +90,11 @@ loaded theme.
 :header-args: :tangle "dot-emacs-base.el"
 :END:
 ** Use lexical binding for the generated configuration
+
 #+begin_src elisp
   ;; -*- lexical-binding: t -*-
 #+end_src
+
 ** Log basic information during startup of emacs
 
 Log when emacs was started, and whether it is running as a daemon or a
@@ -911,9 +915,11 @@ in the region and replaces it with a 'rendered' version.
 :header-args: :tangle "dot-emacs-clojure.el"
 :END:
 ** Use lexical binding for the generated configuration
+
 #+begin_src elisp
   ;; -*- lexical-binding: t -*-
 #+end_src
+
 ** Install clojure-mode and cider
 
 Ensure clojure-mode and cider are installed.
@@ -1088,6 +1094,62 @@ sample data in a repl or test.
     (insert "\""))
 
   (global-set-key (kbd "C-æ u") 'qrt/uuid)
+#+end_src
+
+* Scheme
+:PROPERTIES:
+:header-args: :tangle "dot-emacs-scheme.el"
+:END:
+
+Very basic setup to interact with scheme. The scheme implementation of
+choice here is guile, which should be installed on the machine, but
+can be adjusted for other scheme implementations.
+
+** Use lexical binding for the generated configuration
+
+#+begin_src elisp
+  ;; -*- lexical-binding: t -*-
+#+end_src
+
+** Install geiser-guile
+
+#+begin_src elisp
+  (ensure-packages-installed '(geiser-guile))
+#+end_src
+
+Once setup, ~M-x geiser~ should open up a running geiser repl. Buffers
+in scheme-mode (such as visited files with .scm extension or org-babel
+blocks) can then automatically interact with the repl.
+
+** Setup lisp minor modes
+
+Start the same minor modes as used for elisp and clojure.
+
+#+begin_src elisp
+  (add-hook 'scheme-mode-hook #'start-lisp-minor-modes)
+#+end_src
+
+** Qrt eval print last sexp as comment
+
+A small helper function to evaluate the last s-expression, and print
+the result as a comment on the next line.
+
+#+begin_src elisp
+  (defun qrt/geiser-eval-last-sexp-print-as-comment ()
+    "Evaluate last scheme s-expression and print the result as a
+    comment on the next line."
+    (interactive)
+    (set-mark-command nil)
+    (geiser-eval-last-sexp t)
+    (set-mark-command t)
+    (paredit-kill)
+    (newline)
+    (insert ";; => ")
+    (yank))
+
+  (with-eval-after-load 'geiser-mode
+    (define-key geiser-mode-map (kbd "C-æ r")
+                'qrt/geiser-eval-last-sexp-print-as-comment))
 #+end_src
 
 * Currently disabled (no tangle)                                  :obsoleted:
