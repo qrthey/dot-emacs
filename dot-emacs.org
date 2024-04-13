@@ -320,6 +320,9 @@ activated.
 
 **** enable auto-fill-mode when org mode is activated
 
+~auto-fill-mode~ automatically breaks the current line while typing
+when the line grows longer than the value of ~fill-column~.
+
 #+begin_src elisp
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 #+end_src
@@ -708,6 +711,33 @@ transparency control.
     (set-frame-parameter nil 'alpha-background v))
 
   (global-set-key (kbd "C-æ o") 'qrt/screen-opaqueness)
+#+end_src
+
+** Qrt Unfill Paragraph
+
+The built-in ~fill-paragraph~ command reflows paragraphs, inserting
+and removing newlines so that no lines in the paragraph are longer
+than the value of ~fill-column~. This is nice when writing text.
+
+Sometimes it is desired not to have extra newlines inside of a
+paragraph, like when copying text to an input field in a browser. The
+~qrt/unfill-paragraph~ command piggy-backs on ~fill-paragraph~,
+temporarily setting ~fill-column~ to a large value.
+
+The new function is bound to M-Q (where ~fill-paragraph~ by default is
+bout to M-q).
+
+#+begin_src elisp
+  (defun qrt/unfill-paragraph ()
+    "Unfill the current paragraph.
+
+  Works on the current region if one is active."
+    (interactive)
+    (let ((fill-column 999999999))
+      (fill-paragraph nil t)
+      (forward-line 0)))
+
+  (global-set-key (kbd "M-Q") 'qrt/unfill-paragraph)
 #+end_src
 
 ** Qrt Quick note taking with org mode
