@@ -552,7 +552,8 @@ frame.
 
 #+begin_src elisp
   (ensure-packages-installed '(avy))
-  (global-set-key (kbd "C-æ C-æ") 'avy-goto-char)
+  (global-set-key (kbd "C-æ C-æ") 'avy-goto-char-timer)
+  (setq avy-timeout-seconds 0.3)
 #+end_src
 
 ** Magit
