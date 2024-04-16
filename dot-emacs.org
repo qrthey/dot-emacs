@@ -359,8 +359,6 @@ points for headings list items.
 #+begin_src elisp
   (ensure-packages-installed '(org-bullets))
 
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
   (font-lock-add-keywords
    'org-mode
    '(("^ *\\([-]\\) "
@@ -453,12 +451,14 @@ presentation mode with custom key-bindings.
       (define-key org-tree-slide-mode-map (kbd "C-<left>") 'org-tree-slide-move-previous-tree)))
 
   (defun qrt/init-org-tree-slide ()
+    (org-bullets-mode 1)
     (org-toggle-inline-images 1)
     (qrt/hide-mode-line)
     (qrt/hide-org-meta-line)
     (qrt/font-size 200))
 
   (defun qrt/finish-org-tree-slide ()
+    (org-bullets-mode 0)
     (org-toggle-inline-images nil)
     (qrt/show-mode-line)
     (qrt/show-org-meta-line)
