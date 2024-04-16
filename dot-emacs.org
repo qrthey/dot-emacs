@@ -548,7 +548,8 @@ themes are nice to have around as well.
 ** Avy
 
 Quickly jump the cursor to anywhere visible in the current emacs
-frame.
+frame. Type as many characters as desired. After no input is given for
+0.3 seconds, the jump locations are selectable.
 
 #+begin_src elisp
   (ensure-packages-installed '(avy))
@@ -574,43 +575,44 @@ the extras explicitly at startup.
     (require 'magit-extras))
 #+end_src
 
-** Ivy
-
-Ivy is a generic completion plugin with fuzzy search.
+** Vertico
 
 #+begin_src elisp
-  (ensure-packages-installed '(ivy))
-  (ivy-mode 1)
+  (ensure-packages-installed '(vertico))
+  (vertico-mode 1)
 #+end_src
 
-Ivy has a tendency to exit when pressing a backspace when no more
-characters are left. This can be irritating, explicitly stopping with
-~C-g~ seems the better option.
+** Marginalia
 
 #+begin_src elisp
-  (setq ivy-on-del-error-function #'ignore)
+  (ensure-packages-installed '(marginalia))
+  (marginalia-mode 1)
 #+end_src
 
-** Counsel
-
-Counsel replaces some built in functionality with similar
-functionality that makes better usage of, or integrates better with,
-ivy.
+** Consult
 
 #+begin_src elisp
-  (ensure-packages-installed '(counsel))
-  (counsel-mode 1)
+  (ensure-packages-installed '(consult))
+  (global-set-key (kbd "C-x b") 'consult-buffer)
+  (global-set-key (kbd "C-s") 'consult-line)
 #+end_src
 
-** Swiper
-
-Swiper is a nice alternative to isearch, using ivy to find text
-occurrences in a buffer. Override the keybinding for isearch, using
-swiper instead.
+** Orderless
 
 #+begin_src elisp
-  (ensure-packages-installed '(swiper))
-  (global-set-key (kbd "C-s") 'swiper)
+  (ensure-packages-installed '(orderless))
+  (setq completion-styles '(orderless basic))
+  (setq completion-category-defaults nil)
+  (setq completion-category-overrides '((file (styles partial-completion))))
+#+end_src
+
+** Corfu
+
+#+begin_src elisp
+  (ensure-packages-installed '(corfu))
+  (setq corfu-separator ?\s)
+  (setq corfu-quit-at-boundary nil)
+  (global-corfu-mode 1)
 #+end_src
 
 ** Ag
@@ -1192,7 +1194,7 @@ example, the buffer to edit magit commit messages (COMMIT_EDITMSG)
 seemed to load org-mode stuff (and org minor modes such as indent and
 bullets), even though the buffer once displayed is in ~text~ mode.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setq-default major-mode 'org-mode)
 #+end_src
 
@@ -1200,7 +1202,7 @@ bullets), even though the buffer once displayed is in ~text~ mode.
 
 Company was used previously, but replaced by ~ivy~.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (ensure-packages-installed '(company))
 
   (setq company-dabbrev-downcase nil)
@@ -1216,7 +1218,7 @@ Company was used previously, but replaced by ~ivy~.
 
 ** markdown mode
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (ensure-packages-installed '(markdown-mode))
 #+end_src
 
@@ -1225,7 +1227,7 @@ Company was used previously, but replaced by ~ivy~.
 Currently not being used, replaced by built-in project.el package
 instead.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (ensure-packages-installed '(projectile))
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
@@ -1236,7 +1238,7 @@ instead.
 
 Set the default font type.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (set-face-attribute 'default nil
                       :height 120
                       :family "Ubuntu Mono")
@@ -1248,7 +1250,7 @@ A package to test typing speed, can download text or word lists for
 practice, but also provides possibility to use the text of a custom
 buffer.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (ensure-packages-installed '(speed-type))
 #+end_src
 
@@ -1257,7 +1259,7 @@ buffer.
 To make ditaa work with org blocks in artist mode (language ditaa)
 ditaa must be installed on the machine somewhere. Disabled for now.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (require 'ob-ditaa)
   (setq org-ditaa-jar-path "/usr/share/java/ditaa/ditaa-0.11.jar")
 #+end_src
@@ -1268,7 +1270,7 @@ Not interactive. Can be used with M-: (eval-expression) though to time
 interactive and non interactive functions. Emits a message showing the
 computation and how long it took to complete.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (defmacro qrt/measure-time (&rest body)
     "Compute body and message the time it took to compute it."
     `(let ((start (current-time))
@@ -1286,6 +1288,45 @@ setup of cider to fix problems with leiningens' ~:pedantic :abort~.
 Instead an override is now made in ~~/.lein/profiles~ to override the
 pedantic value to ~:ranges~.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (setq cider-inject-dependencies-at-jack-in nil)
+#+end_src
+
+** Ivy, replaced by vertico
+
+Ivy is a generic completion plugin with fuzzy search.
+
+#+begin_src elisp
+  (ensure-packages-installed '(ivy))
+  (ivy-mode 1)
+#+end_src
+
+Ivy has a tendency to exit when pressing a backspace when no more
+characters are left. This can be irritating, explicitly stopping with
+~C-g~ seems the better option.
+
+#+begin_src elisp
+  (setq ivy-on-del-error-function #'ignore)
+#+end_src
+
+** Counsel, replaced by consult
+
+Counsel replaces some built in functionality with similar
+functionality that makes better usage of, or integrates better with,
+ivy.
+
+#+begin_src elisp
+  (ensure-packages-installed '(counsel))
+  (counsel-mode 1)
+#+end_src
+
+** Swiper, replaced by corfu and friends
+
+Swiper is a nice alternative to isearch, using ivy to find text
+occurrences in a buffer. Override the keybinding for isearch, using
+swiper instead.
+
+#+begin_src elisp
+  (ensure-packages-installed '(swiper))
+  (global-set-key (kbd "C-s") 'swiper)
 #+end_src
