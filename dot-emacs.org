@@ -22,11 +22,15 @@ some of it might be reworked to new sections in the future.
 
 ** Setup
 
-Tangling this document will emit 2 elisp libraries; the files
-~dot-emacs-base.el~ and ~dot-emacs.clojure.el~. Evaluating the
-following code block (use C-c C-c when the cursor is in the source
-block), which itself is not tangled, will after tangling also
-byte-compile the libraries.
+Tangling this document will emit the following 3 elisp libraries.
+
+- dot-emacs-base.el
+- dot-emacs-clojure.el
+- dot-emacs-scheme.el
+
+Evaluating the following code block (use C-c C-c when the cursor is in
+the source block), which itself is not tangled, will do the tangling
+and then byte-compile the produced libraries.
 
 #+begin_src elisp :tangle no :results silent
   (org-babel-tangle)
@@ -41,14 +45,9 @@ compilation enabled, the libraries will on first load also be native
 compiled for even faster future execution.
 
 Create a blank emacs init file (e.g. ~/.emacs) with content reflecting
-the following example to load the desired elisp libraries. The
-~dot-emacs-base~ library is required and must be loaded first. The
-~dot-emacs-clojure~ library is only useful when doing clojure or
-clojurescript development (it is depending on functionality defined in
-the ~dot-emacs-base~ library, which must therefor be loaded first).
-
-Be sure to change to PATH-TO-THIS-REPOSITORY in the example to point
-to the root directory of this git repository.
+the following example to load the desired elisp libraries. Be sure to
+change to PATH-TO-THIS-REPOSITORY in the example to point to the root
+directory of this git repository.
 
 #+begin_example
   ;; -*- lexical-binding: t -*-
@@ -58,6 +57,11 @@ to the root directory of this git repository.
   ;; (load-library "dot-emacs-clojure")
   ;; (load-library "dot-emacs-scheme")
 #+end_example
+
+The ~dot-emacs-base~ library is required and must be loaded first. The
+other libraries are only of use for their specific scenario, but they
+do depend on functionality in the base library, so it should be loaded
+first.
 
 Restarting a blank emacs installation should then automatically
 bootstrap the configuration process. To reset an existing previous
