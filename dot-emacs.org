@@ -83,11 +83,10 @@ this danish character is unlikely to be used by any package.
 
 ** No theme?
 
-No theme is auto-loaded from this config (some are installed though).
-I prefer to add a ~load-theme~ call in the emacs init file (after the
-example prelude above) as this allows usage of different themes on
-different machines, without the need to first unload a previously
-loaded theme.
+No theme is auto-loaded nor installed by this configuration. I prefer
+to add a ~load-theme~ call in the emacs init file (after the example
+prelude above) as this allows usage of different themes on different
+machines, without the need to first unload a previously loaded theme.
 
 * Base
 :PROPERTIES:
@@ -538,15 +537,6 @@ Some default keybindings. Quickly start different shell types etc.
   (global-set-key (kbd "C-æ s a") (lambda ()
                                     (interactive)
                                     (ansi-term "/bin/bash")))
-#+end_src
-
-** Sanityinc Tomorrow Themes
-
-Emacs comes with some good default themes. The sanityinc-tomorrow
-themes are nice to have around as well.
-
-#+begin_src elisp
-  (ensure-packages-installed '(color-theme-sanityinc-tomorrow))
 #+end_src
 
 ** Avy
