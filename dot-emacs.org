@@ -589,6 +589,8 @@ the extras explicitly at startup.
   (ensure-packages-installed '(consult))
   (global-set-key (kbd "C-x b") 'consult-buffer)
   (global-set-key (kbd "C-s") 'consult-line)
+
+  (global-set-key (kbd "C-æ t l") 'consult-theme)
 #+end_src
 
 ** Orderless
@@ -659,29 +661,6 @@ Register a hook to start the lisp minor-modes for the emacs-lisp-mode.
 
 #+begin_src elisp
   (add-hook 'emacs-lisp-mode-hook #'start-lisp-minor-modes)
-#+end_src
-
-** Qrt Theme control
-
-When themes are loaded, they are stacked on top of each other.
-Sometimes it makes sense to reset to default emacs theming and load a
-single theme on top of it (as the theme was probably designed for).
-
-#+begin_src elisp
-  (defun qrt/disable-all-themes ()
-    (interactive)
-    (mapcar #'disable-theme custom-enabled-themes))
-
-  (defun qrt/load-theme (theme)
-    (interactive
-     (list (intern (completing-read "Load custom theme: "
-                                    (mapcar #'symbol-name
-                                            (custom-available-themes))))))
-    (qrt/disable-all-themes)
-    (load-theme theme))
-
-  (global-set-key (kbd "C-æ t q") 'qrt/disable-all-themes)
-  (global-set-key (kbd "C-æ t l") 'qrt/load-theme)
 #+end_src
 
 ** Qrt Font size
@@ -1323,4 +1302,27 @@ swiper instead.
 #+begin_src elisp
   (ensure-packages-installed '(swiper))
   (global-set-key (kbd "C-s") 'swiper)
+#+end_src
+
+** Qrt Theme control, replaced by consult
+
+When themes are loaded, they are stacked on top of each other.
+Sometimes it makes sense to reset to default emacs theming and load a
+single theme on top of it (as the theme was probably designed for).
+
+#+begin_src elisp
+  (defun qrt/disable-all-themes ()
+    (interactive)
+    (mapcar #'disable-theme custom-enabled-themes))
+
+  (defun qrt/load-theme (theme)
+    (interactive
+     (list (intern (completing-read "Load custom theme: "
+                                    (mapcar #'symbol-name
+                                            (custom-available-themes))))))
+    (qrt/disable-all-themes)
+    (load-theme theme))
+
+  (global-set-key (kbd "C-æ t q") 'qrt/disable-all-themes)
+  (global-set-key (kbd "C-æ t l") 'qrt/load-theme)
 #+end_src
