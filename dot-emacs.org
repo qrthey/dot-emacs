@@ -589,7 +589,7 @@ the extras explicitly at startup.
   (ensure-packages-installed '(consult))
   (global-set-key (kbd "C-x b") 'consult-buffer)
   (global-set-key (kbd "C-s") 'consult-line)
-
+  (global-set-key (kbd "M-y") 'consult-yank-replace)
   (global-set-key (kbd "C-æ t l") 'consult-theme)
 #+end_src
 
