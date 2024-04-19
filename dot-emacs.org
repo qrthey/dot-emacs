@@ -678,10 +678,11 @@ key-map re-enables the standard eglot behavior.
     (eldoc-mode 1))
 #+end_src
 
-Register a hook to start the lisp minor-modes for the emacs-lisp-mode.
+Register a hook to start the lisp minor-modes for the lisp-data-mode
+and its derivative modes (elisp etc).
 
 #+begin_src elisp
-  (add-hook 'emacs-lisp-mode-hook #'start-lisp-minor-modes)
+  (add-hook 'lisp-data-mode-hook #'start-lisp-minor-modes)
 #+end_src
 
 ** Qrt Font size
