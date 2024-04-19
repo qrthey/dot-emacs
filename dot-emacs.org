@@ -571,6 +571,8 @@ the extras explicitly at startup.
 
 ** Vertico
 
+Vertico is a minibuffer completion UI.
+
 #+begin_src elisp
   (ensure-packages-installed '(vertico))
   (vertico-mode 1)
@@ -578,12 +580,18 @@ the extras explicitly at startup.
 
 ** Marginalia
 
+Marginalia provides extra context information, for example during
+completions.
+
 #+begin_src elisp
   (ensure-packages-installed '(marginalia))
   (marginalia-mode 1)
 #+end_src
 
 ** Consult
+
+Consult provides replacements for built-in commands, lots of them with
+preview capabilities.
 
 #+begin_src elisp
   (ensure-packages-installed '(consult))
@@ -595,6 +603,8 @@ the extras explicitly at startup.
 
 ** Orderless
 
+Orderless is a completion style that works well with vertico.
+
 #+begin_src elisp
   (ensure-packages-installed '(orderless))
   (setq completion-styles '(orderless basic))
@@ -604,6 +614,8 @@ the extras explicitly at startup.
 
 ** Corfu
 
+Corfu is an in-buffer completion completion UI.
+
 #+begin_src elisp
   (ensure-packages-installed '(corfu))
   (setq corfu-separator ?\s)
@@ -612,6 +624,8 @@ the extras explicitly at startup.
 #+end_src
 
 ** Embark
+
+Embark enables lots of actions on contextual targets.
 
 #+begin_src elisp
   (ensure-packages-installed '(embark embark-consult))
