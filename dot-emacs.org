@@ -611,6 +611,13 @@ the extras explicitly at startup.
   (global-corfu-mode 1)
 #+end_src
 
+** Embark
+
+#+begin_src elisp
+  (ensure-packages-installed '(embark embark-consult))
+  (global-set-key (kbd "C-.") 'embark-act)
+#+end_src
+
 ** Ag
 
 Ag is a frontend for the ~ag~ linux program, in Arch linux distributed
