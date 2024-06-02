@@ -711,6 +711,42 @@ transparency control.
   (global-set-key (kbd "C-æ o") 'qrt/screen-opaqueness)
 #+end_src
 
+** Qrt Window Spliting
+
+~C-x 2~ and ~C-x 3~ split the current window, to the right and below
+respectively. The new window is not switched to, and it shows the same
+buffer as the current one.
+
+One workflow is to split the window, go to the new one and switch to
+another buffer there. The ~C-æ 2~ and ~C-æ 3~ keybindings are globally
+defined to provide this behavior from a single command.
+
+This ~visible~ value makes emacs try to show a buffer that isn't
+already shown (skips the visible ones). If all buffers are already
+shown, one of those will be shown again in the new window.
+
+#+begin_src elisp
+  (defun qrt/split-window-to-other-buffer-below
+      ()
+    (interactive)
+    (split-window-below)
+    (other-window 1)
+    (let ((switch-to-prev-buffer-skip 'visible))
+      (switch-to-next-buffer)))
+
+  (global-set-key (kbd "C-æ 2") 'qrt/split-window-to-other-buffer-below)
+
+  (defun qrt/split-window-to-other-buffer-right
+      ()
+    (interactive)
+    (split-window-right)
+    (other-window 1)
+    (let ((switch-to-prev-buffer-skip 'visible))
+      (switch-to-next-buffer)))
+
+  (global-set-key (kbd "C-æ 3") 'qrt/split-window-to-other-buffer-right)
+#+end_src
+
 ** Qrt Unfill Paragraph
 
 The built-in ~fill-paragraph~ command reflows paragraphs, inserting
