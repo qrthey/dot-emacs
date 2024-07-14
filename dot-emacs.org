@@ -244,6 +244,21 @@ file sizes are reported.
   (setq dired-listing-switches "-alh --group-directories-first")
 #+end_src
 
+In dired, sub-directories can be inserted. By default, when invoking
+~find-file~, the default-directory associated to the dired buffer is
+used as a starting point. The following changes this so that
+~find-file~ becomes subdir aware in dired-mode.
+
+#+begin_src elisp
+  (defun dired-subdir-aware (orig-fn &rest args)
+    (if (eq major-mode 'dired-mode)
+        (let ((default-directory (dired-current-directory)))
+          (apply orig-fn args))
+      (apply orig-fn args)))
+
+  (advice-add 'find-file-read-args :around 'dired-subdir-aware)
+#+end_src
+
 *** ediff
 
 Configure some better defaults for ~ediff~.
