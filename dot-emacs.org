@@ -146,7 +146,11 @@ configured package-archives.
 
 #+begin_src elisp
   (ensure-packages-installed '(inhibit-mouse))
+
   (inhibit-mouse-mode)
+
+  (add-hook 'server-after-make-frame-hook
+            (lambda () (inhibit-mouse-mode)))
 #+end_src
 
 *** Don't show the splash-screen at startup
