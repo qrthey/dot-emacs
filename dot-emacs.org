@@ -142,6 +142,13 @@ configured package-archives.
 #+end_src
 
 ** Configuration of standard emacs
+*** Disregard mouse input
+
+#+begin_src elisp
+  (ensure-packages-installed '(inhibit-mouse))
+  (inhibit-mouse-mode)
+#+end_src
+
 *** Don't show the splash-screen at startup
 
 #+begin_src elisp
