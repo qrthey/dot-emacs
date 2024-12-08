@@ -270,6 +270,22 @@ used as a starting point. The following changes this so that
   (advice-add 'find-file-read-args :around 'dired-subdir-aware)
 #+end_src
 
+The following enables basically the same for ~shell~ by introducing a
+new function.
+
+#+begin_src elisp
+  (defun qrt/shell-at-current-dired-dir
+      ()
+    (interactive)
+    (let ((default-directory (if (eq major-mode 'dired-mode)
+                                 (dired-current-directory)
+                               default-directory)))
+      (setq current-prefix-arg '(4))
+      (funcall-interactively 'shell (concat "shell - " default-directory))))
+
+  (global-set-key (kbd "C-æ d s") 'qrt/shell-at-current-dired-dir)
+#+end_src
+
 *** ediff
 
 Configure some better defaults for ~ediff~.
