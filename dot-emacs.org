@@ -856,7 +856,8 @@ append a new root level heading.
 ** Qrt Pomodoro
 
 The interactive ~qrt/start-pomodoro~ function starts a timer for a
-task to work on, and notfies when it expires.
+task to work on, and notfies when it expires. Asks for a task title
+and an amount of minutes to work on the task (defaults to 25 minutes).
 
 #+begin_src elisp
   (defun qrt/notify-pomodoro-done
@@ -881,6 +882,25 @@ task to work on, and notfies when it expires.
      (lambda ()
        (qrt/notify-pomodoro-done qrt/pomodoro-current-task-name
                                  qrt/pomodoro-current-task-time-minutes))))
+#+end_src
+
+The following function starts a pomodoro for a selected org-heading.
+The task name is derived from the current org-heading. The amount of
+minutes to use on the task is proposed to be 25 minutes. The org
+buffer is automatically narrowed to the subtree for the current
+org-header, whith only its direct children being shown.
+
+#+begin_src elisp
+  (defun qrt/org-heading->pomodoro
+      ()
+    (interactive)
+    (let* ((task (substring-no-properties (org-get-heading t t t t)))
+           (time (read-number (concat "minutes to work on '" task "': ") 25)))
+      (org-narrow-to-subtree)
+      (org-fold-hide-subtree)
+      (org-fold-show-entry)
+      (org-fold-show-children)
+      (qrt/start-pomodoro task time)))
 #+end_src
 
 ** Qrt ss8ch (ssh-agent integration)
